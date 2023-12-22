@@ -74,7 +74,7 @@ def rename_images_in_dir(path):
 	elif os.path.isfile(path) and path.lower().endswith(('.png', '.jpg', '.jpeg')):
 		directory, filename = os.path.split(path)
 		new_name = rename_file(path)
-		# os.rename(path, os.path.join(directory, new_name))
+		os.rename(path, os.path.join(directory, new_name))
 
 
 if __name__ == "__main__":
