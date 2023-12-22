@@ -1,10 +1,10 @@
 import os
-import replicate
 import base64
 import argparse
 import imghdr
 import xattr
 import time
+import requests
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -20,7 +20,7 @@ def encode_image(image_path):
 	"""Encode an image into URI"""
 	with open(image_path, "rb") as image_file:
 		encoded_string = base64.b64encode(image_file.read()).decode("utf-8")
-		return "data:image/png;base64," + encoded_string
+		return encoded_string
 
 def rename_file(path):
     # Check if path is a file and exists
@@ -37,19 +37,13 @@ def rename_file(path):
 
 
 	uri = encode_image(path)
-
-	# use https://replicate.com/yorickvp/llava-13b to rename file
-	output = replicate.run(
-		"yorickvp/llava-13b:e272157381e2a3bf12df3a8edd1f38d1dbd736bbb7437277c8b34175f8fce358",
-		input={
-			"image": uri,
-			"top_p": 1,
-			"prompt": "Can you create a filename for this image? Just give me the filename, no pre-amble, and no extension.",
-			"max_tokens": 1024,
-			"temperature": 0.2
-		}
-	)
-	output = "".join([x for x in output])
+	response = requests.post("http://localhost:11434/api/generate", json={
+		"model": "llava:13b",
+		"prompt": "Can you create a filename for this image based what's in it? Just give me the filename, no pre-amble, and no extension.",
+		"stream": False,
+		"images": [uri]
+	})
+	output = response.json()['response']
 
 	# get extension from original filename
 	_directory, filename = os.path.split(path)
@@ -80,7 +74,7 @@ def rename_images_in_dir(path):
 	elif os.path.isfile(path) and path.lower().endswith(('.png', '.jpg', '.jpeg')):
 		directory, filename = os.path.split(path)
 		new_name = rename_file(path)
-		os.rename(path, os.path.join(directory, new_name))
+		# os.rename(path, os.path.join(directory, new_name))
 
 
 if __name__ == "__main__":
