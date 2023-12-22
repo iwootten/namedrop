@@ -1,6 +1,6 @@
-# Namedrop
+# Namedrop Ollama
 
-Writes nice file names for your images.
+Writes nice file names for your images using ollama/llava.
 
 Demo:
 https://x.com/charliebholtz/status/1737667912784134344?s=20
@@ -22,11 +22,8 @@ source venv/bin/activate
 Then, install the dependencies:
 `pip install -r requirements.txt`
 
-Make a [Replicate](https://replicate.com) account and set your tokens:
+Run [ollama](https://ollama.ai) on your machine and pull the model using `ollama pull llava:13b`
 
-```
-export REPLICATE_API_TOKEN=<token>
-```
 
 ## Run it!
 
